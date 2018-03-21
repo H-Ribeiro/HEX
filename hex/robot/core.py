@@ -9,13 +9,13 @@ from time import sleep
 
 joint_properties = {
 
-    'LFH': (0, -43, 100), 'LFK': (1, -45, 30), 'LFA': (2, -50, 87),
-    'RFH': (3, 43, -100), 'RFK': (4, 45, -30), 'RFA': (5, 50, -87),
-    'LMH': (6, -43, 45), 'LMK': (7, -45, 25), 'LMA': (8, -50, 87),
-    'RMH': (9, 43, -50), 'RMK': (10, 45, -30), 'RMA': (11, 50, -82),
-    'LBH': (12, -50, 50), 'LBK': (13, -45, 30), 'LBA': (14, -50, 86),
-    'RBH': (15, 50, -50), 'RBK': (16, 45, -25), 'RBA': (17, 50, -67),
-    'N': (18, 0, 0)
+    'LFH': (0, 270, 480, -1), 'LFK': (1, 200, 480, -1), 'LFA': (2, 165, 500, 1),
+    'RFH': (3, 280, 610, 1), 'RFK': (4, 300, 610, 1), 'RFA': (5, 270, 510, -1),
+    'LMH': (6, 255, 470, -1), 'LMK': (7, 250, 540, -1), 'LMA': (8, 170, 510, 1),
+    'RMH': (9, 380, 540, 1), 'RMK': (10, 295, 600, 1), 'RMA': (11, 270, 420, -1),
+    'LBH': (12, 240, 570, -1), 'LBK': (13, 210, 510, -1), 'LBA': (14, 280, 555, 1),
+    'RBH': (15, 275, 535, 1), 'RBK': (16, 280, 580, 1), 'RBA': (17, 255, 550, -1),
+    'N': (18, 0, 0, 1)
 }
 
 driver1 = PWM(0x40)
@@ -129,7 +129,7 @@ class Joint:
     def __init__(self, joint_type, jkey, maxx = 90, leeway = 0):
 
         self.joint_type, self.name =  joint_type, jkey
-        self.channel, self.min_pulse, self.max_pulse = joint_properties[jkey]
+        self.channel, self.min_pulse, self.max_pulse, self.direction = joint_properties[jkey]
         self.max, self.leeway = maxx, leeway
 
         self.off()
@@ -137,7 +137,8 @@ class Joint:
     def pose(self, angle = 0):
 
         angle = constrain(angle, -(self.max + self.leeway), self.max + self.leeway)
-        pulse = remap(angle, (-self.max, self.max), (self.min_pulse, self.max_pulse))
+        #pulse = remap(angle, (-self.max, self.max), (self.min_pulse, self.max_pulse))
+        pulse = remap((angle * self.direction), (-self.max, self.max), (self.min_pulse, self.max_pulse))
 
         drive(self.channel, pulse)
         self.angle = angle
