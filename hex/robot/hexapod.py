@@ -78,7 +78,7 @@ class Hexapod(HexapodCore):
             self.stride(self.tripod1, self.tripod2, swings, raised, floor, t)
             self.stride(self.tripod2, self.tripod1, reverse_swings, raised, floor, t)
 
-    def rotate(self, offset = 40, raised = -30, floor = 50, repetitions = 5, t = 0.2):
+    def rotate(self, offset = 40, raised = -30, floor = 20, repetitions = 5, t = 0.2):
         """ if offset > 0, hexy rotates left, else right """
 
         for r in xrange(repetitions):
