@@ -68,7 +68,7 @@ class Hexapod(HexapodCore):
 
         sleep(t)
 
-    def walk(self, offset = 0 , swing =  10, raised = -20, floor = 20, repetitions = 4, t = 0.2):
+    def walk(self, offset = 0 , swing =  10, raised = -20, floor = 30, repetitions = 4, t = 0.2):
         """ if swing > 0, hexy moves forward else backward """
 
         swings = [offset - swing, swing, -(offset + swing)]
