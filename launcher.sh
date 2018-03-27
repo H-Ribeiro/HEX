@@ -2,9 +2,8 @@
 #launcher.sh
 
 cd /
-cd home/pi/hex
+cd home/pi/hex/demo0
 
-sudo python -m hex.demo.demo1
-sudo python -m hex.demo.demo2
-sudo python -m hex.demo.demo3
+sudo python -m hex.demo.demo0
+
 cd /

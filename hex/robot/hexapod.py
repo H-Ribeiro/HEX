@@ -5,15 +5,16 @@ class Hexapod(HexapodCore):
 
     def boot_up(self):
 
-        self.look()
+        #self.look()
         self.lie_down()
         self.curl_up()
         self.lie_flat()
-        self.get_up()
+        self.squat(35)
+        #self.get_up()
 
     def shut_down(self):
 
-        self.look()
+        #self.look()
         self.lie_down()
         self.lie_flat()
         self.curl_up(die = True)
@@ -43,16 +44,16 @@ class Hexapod(HexapodCore):
 
         sleep(t)
 
-    def get_up(self, maxx = 70, step = 4):
+    # def get_up(self, maxx = 70, step = 4):
+    #
+    #     for angle in xrange(-maxx, maxx + 1, step):
+    #         self.squat(angle)
+    #
+    #     self.default()
 
-        for angle in xrange(-maxx, maxx + 1, step):
-            self.squat(angle)
-
-        self.default()
-
-    def look(self, angle = 0, t = 0.05):
-        self.neck.pose(angle)
-        sleep(t)
+    # def look(self, angle = 0, t = 0.05):
+    #     self.neck.pose(angle)
+    #     sleep(t)
 
     def twist_hip(self, angle = 0, t = 0.1):
 
@@ -68,7 +69,7 @@ class Hexapod(HexapodCore):
 
         sleep(t)
 
-    def walk(self, offset = 0 , swing =  10, raised = -20, floor = 30, repetitions = 4, t = 0.2):
+    def walk(self, offset = 0 , swing =  10, raised = -10, floor = 30, repetitions = 4, t = 0.2):
         """ if swing > 0, hexy moves forward else backward """
 
         swings = [offset - swing, swing, -(offset + swing)]
@@ -78,7 +79,7 @@ class Hexapod(HexapodCore):
             self.stride(self.tripod1, self.tripod2, swings, raised, floor, t)
             self.stride(self.tripod2, self.tripod1, reverse_swings, raised, floor, t)
 
-    def rotate(self, offset = 40, raised = -30, floor = 20, repetitions = 5, t = 0.2):
+    def rotate(self, offset = 40, raised = -10, floor = 30, repetitions = 5, t = 0.2):
         """ if offset > 0, hexy rotates left, else right """
 
         for r in xrange(repetitions):
