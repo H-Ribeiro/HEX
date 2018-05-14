@@ -8,7 +8,7 @@ class Hexapod(HexapodCore):
     def boot_up(self):
 
         #self.look()
-        self.lie_down()
+        #self.lie_down()
         self.curl_up()
         self.lie_flat()
         self.squat(35)
@@ -17,6 +17,7 @@ class Hexapod(HexapodCore):
     def shut_down(self):
 
         #self.look()
+        self.curl_up(t = 0.5)
         self.lie_down()
         self.lie_flat()
         self.curl_up(die = True)
@@ -39,19 +40,19 @@ class Hexapod(HexapodCore):
 
         sleep(t)
 
-    def lie_down(self, maxx = 50, step = 4, t = 0.15):
+    def lie_down(self, maxx = 50, step = 4, t = 0.4):
 
         for angle in xrange(maxx, -(maxx + 1), -step):
             self.squat(angle)
 
         sleep(t)
 
-    # def get_up(self, maxx = 70, step = 4):
-    #
-    #     for angle in xrange(-maxx, maxx + 1, step):
-    #         self.squat(angle)
-    #
-    #     self.default()
+    #def get_up(self, maxx = 50, step = 4):
+
+     #   for angle in xrange(-maxx, maxx + 1, step):
+      #      self.squat(angle)
+
+       # self.default()
 
     # def look(self, angle = 0, t = 0.05):
     #     self.neck.pose(angle)
@@ -71,7 +72,7 @@ class Hexapod(HexapodCore):
 
         sleep(t)
 
-    def walk(self, offset = 0 , swing =  10, raised = -10, floor = 30, repetitions = 4, t = 0.2):
+    def walk(self, offset = 0 , swing =  10, raised = -15, floor = 30, repetitions = 4, t = 0.3):
         """ if swing > 0, hexy moves forward else backward """
 
         swings = [offset - swing, swing, -(offset + swing)]
@@ -133,7 +134,7 @@ class Hexapod(HexapodCore):
         sleep(t)
 
     def default(self, offset = 45, floor = 60, raised = -30,  t = 0.2):
-        """ Hex's default pose, offset > 0 brings the front and back legs to the side """
+        """ Hexy's default pose, offset > 0 brings the front and back legs to the side """
 
         swings = [offset, 0, -offset]
 
@@ -161,19 +162,11 @@ class Hexapod(HexapodCore):
 
         sleep(t)
 
-    def walk_back(self, offset = 0 , swing =  -10, raised = -10, floor = 30, repetitions = 4, t = 0.2):
-        """ if swing > 0, hexy moves forward else backward """
 
-        swings = [offset - swing, swing, -(offset + swing)]
-        reverse_swings = [-x for x in swings]
 
-        for r in xrange(repetitions):
-            self.stride(self.tripod1, self.tripod2, swings, raised, floor, t)
-            self.stride(self.tripod2, self.tripod1, reverse_swings, raised, floor, t)
+    def auto_pod(self):
 
-    def auto_pod(self)
-        """ Set GPIO pin numbering """
-        GPIO.setmode(GPIO.BCM)
+        GPIO.setmode(GPIO.BCM)                     #Set GPIO pin numbering
 
         TRIG = 17                                  #Associate pin 17 to TRIG
         ECHO = 18                                  #Associate pin 18 to ECHO
@@ -183,28 +176,39 @@ class Hexapod(HexapodCore):
         GPIO.setup(TRIG,GPIO.OUT)                  #Set pin as GPIO out
         GPIO.setup(ECHO,GPIO.IN)                   #Set pin as GPIO in
 
+        timeout = time.time() + 20					#timer to shutdown 20 sec
+
         while True:
 
-          GPIO.output(TRIG, False)                 #Set TRIG as LOW
-          print "Waitng For Sensor To Settle"
-          time.sleep(1)                            #Delay of 1 seconds
+            GPIO.output(TRIG, False)                 #Set TRIG as LOW
+            print "Waitng For Sensor To Settle"
+            time.sleep(1)                            #Delay of 1 second
 
-          GPIO.output(TRIG, True)                  #Set TRIG as HIGH
-          time.sleep(0.00001)                      #Delay of 0.00001 seconds
-          GPIO.output(TRIG, False)                 #Set TRIG as LOW
+            GPIO.output(TRIG, True)                  #Set TRIG as HIGH
+            time.sleep(0.00001)                      #Delay of 0.00001 seconds
+            GPIO.output(TRIG, False)                 #Set TRIG as LOW
 
-          while GPIO.input(ECHO)==0:               #Check whether the ECHO is LOW
-            pulse_start = time.time()              #Saves the last known time of LOW pulse
+            while GPIO.input(ECHO)==0:               #Check whether the ECHO is LOW
+                pulse_start = time.time()              #Saves the last known time of LOW pulse
 
-          while GPIO.input(ECHO)==1:               #Check whether the ECHO is HIGH
-            pulse_end = time.time()                #Saves the last known time of HIGH pulse
+            while GPIO.input(ECHO)==1:               #Check whether the ECHO is HIGH
+                pulse_end = time.time()                #Saves the last known time of HIGH pulse
 
-          pulse_duration = pulse_end - pulse_start #Get pulse duration to a variable
+            pulse_duration = pulse_end - pulse_start #Get pulse duration to a variable
 
-          distance = pulse_duration * 17150        #Multiply pulse duration by 17150 to get distance
-          distance = round(distance, 2)            #Round to two decimal points
+            distance = pulse_duration * 17150        #Multiply pulse duration by 17150 to get distance
 
-          if distance < 10:      #Check whether the distance is within range
-            self.walk_back()
-          else:
-            print "Out Of Range"
+            distance = round(distance, 2)            #Round to two decimal points
+
+        #  if distance > 2 and distance < 400:      #Check whether the distance is within range
+        #    print "Distance:",distance - 0.5,"cm"  #Print distance with 0.5 cm calibration
+        #  else:
+        #    print "Out Of Range"                   #display out of range
+
+            if distance < 20 :      #Check whether the distance is within range
+                self.walk(swing = -10, repetitions = 1)
+            else:
+                print "Out Of Range"
+                if time.time() > timeout:
+                    self.shut_down()
+                    break
