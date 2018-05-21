@@ -26,3 +26,7 @@ hex.lie_down()
 hex.walk(swing = 20, repetitions = 10)
 
 hex.get_up(maxx = 30, step = 4)
+
+
+Video playlist:
+https://www.youtube.com/playlist?list=PLzvBwCPNuxcbhuNtr4e46624VTsDVG8bE
