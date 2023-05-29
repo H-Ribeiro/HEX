@@ -8,7 +8,7 @@ class Hexapod(HexapodCore):
     def boot_up(self):
 
         #self.look()
-        #self.lie_down()
+        self.lie_down()
         self.curl_up()
         self.lie_flat()
         self.squat(35)
@@ -17,7 +17,6 @@ class Hexapod(HexapodCore):
     def shut_down(self):
 
         #self.look()
-        self.curl_up(t = 0.5)
         self.lie_down()
         self.lie_flat()
         self.curl_up(die = True)
@@ -40,19 +39,19 @@ class Hexapod(HexapodCore):
 
         sleep(t)
 
-    def lie_down(self, maxx = 50, step = 4, t = 0.4):
+    def lie_down(self, maxx = 50, step = 4, t = 0.15):
 
         for angle in xrange(maxx, -(maxx + 1), -step):
             self.squat(angle)
 
         sleep(t)
 
-    #def get_up(self, maxx = 50, step = 4):
-
-     #   for angle in xrange(-maxx, maxx + 1, step):
-      #      self.squat(angle)
-
-       # self.default()
+    # def get_up(self, maxx = 70, step = 4):
+    #
+    #     for angle in xrange(-maxx, maxx + 1, step):
+    #         self.squat(angle)
+    #
+    #     self.default()
 
     # def look(self, angle = 0, t = 0.05):
     #     self.neck.pose(angle)
@@ -72,8 +71,8 @@ class Hexapod(HexapodCore):
 
         sleep(t)
 
-    def walk(self, offset = 0 , swing =  10, raised = -15, floor = 30, repetitions = 4, t = 0.3):
-        """ if swing > 0, hex moves forward else backward """
+    def walk(self, offset = 0 , swing =  10, raised = -10, floor = 30, repetitions = 4, t = 0.2):
+        """ if swing > 0, hexy moves forward else backward """
 
         swings = [offset - swing, swing, -(offset + swing)]
         reverse_swings = [-x for x in swings]
@@ -83,7 +82,7 @@ class Hexapod(HexapodCore):
             self.stride(self.tripod2, self.tripod1, reverse_swings, raised, floor, t)
 
     def rotate(self, offset = 40, raised = -10, floor = 30, repetitions = 5, t = 0.2):
-        """ if offset > 0, hex rotates left, else right """
+        """ if offset > 0, hexy rotates left, else right """
 
         for r in xrange(repetitions):
 
@@ -120,7 +119,7 @@ class Hexapod(HexapodCore):
         sleep(t)
 
     def tilt(self, front_angle = 50, middle_angle = 25, back_angle = 0, t = 0.2):
-        """ if front_angle > middle_angle > back_angle hex's front is higher than his back """
+        """ if front_angle > middle_angle > back_angle hexy's front is higher than his back """
 
         self.right_front.move(knee_angle = front_angle)
         self.left_front.move(knee_angle = front_angle)
@@ -134,7 +133,7 @@ class Hexapod(HexapodCore):
         sleep(t)
 
     def default(self, offset = 45, floor = 60, raised = -30,  t = 0.2):
-        """ hex's default pose, offset > 0 brings the front and back legs to the side """
+        """ Hexy's default pose, offset > 0 brings the front and back legs to the side """
 
         swings = [offset, 0, -offset]
 
@@ -162,7 +161,15 @@ class Hexapod(HexapodCore):
 
         sleep(t)
 
+    def walk_back(self, offset = 0 , swing =  -10, raised = -10, floor = 30, repetitions = 2, t = 0.2):
+        """ if swing > 0, hexy moves forward else backward """
 
+        swings = [offset - swing, swing, -(offset + swing)]
+        reverse_swings = [-x for x in swings]
+
+        for r in xrange(repetitions):
+            self.stride(self.tripod1, self.tripod2, swings, raised, floor, t)
+            self.stride(self.tripod2, self.tripod1, reverse_swings, raised, floor, t)
 
     def auto_pod(self):
 
@@ -179,6 +186,9 @@ class Hexapod(HexapodCore):
         timeout = time.time() + 20					#timer to shutdown 20 sec
 
         while True:
+
+            if time.time() > timeout:
+                self.shut_down()
 
             GPIO.output(TRIG, False)                 #Set TRIG as LOW
             print "Waitng For Sensor To Settle"
@@ -205,10 +215,7 @@ class Hexapod(HexapodCore):
         #  else:
         #    print "Out Of Range"                   #display out of range
 
-            if distance < 20 :      #Check whether the distance is within range
-                self.walk(swing = -10, repetitions = 1)
+            if distance < 15 :      #Check whether the distance is within range
+                self.walk_back()
             else:
-                print "Out Of Range"
-                if time.time() > timeout:
-                    self.shut_down()
-                    break
+                print "Out Of Range"                   #display out of range

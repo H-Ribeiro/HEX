@@ -8,6 +8,6 @@ def calibrate_joint(joint, t, mn, mx, z):
             joint.pose(angle)
             sleep(t)
             
-hex = HexapodCore()
-calibrate_joint( hex.right_back.knee, t = 2, mn = -45, mx = 45, z = 0)
-#hex.off()
+hexy = HexapodCore()
+calibrate_joint( hexy.right_back.knee, t = 2, mn = -45, mx = 45, z = 0)
+#hexy.off()
